@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.netflix.astyanax.connectionpool.impl.SimpleAuthenticationCredentials;
+import com.wizecommerce.hecuba.exceptions.HecubaException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.configuration.Configuration;
@@ -291,7 +293,7 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 	}
 
 	@Override
-	public void updateRow(K key, Map<String, Object> row, Map<String, Long> timestamps, Map<String, Integer> ttls) throws Exception {
+	public void updateRow(K key, Map<String, Object> row, Map<String, Long> timestamps, Map<String, Integer> ttls) throws HecubaException {
 		// Inserting data
 		MutationBatch m = keyspace.prepareMutationBatch();
 
@@ -359,7 +361,7 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 			if (log.isDebugEnabled()) {
 				log.debug("HecubaClientManager error while updating key " + key.toString());
 			}
-			throw e;
+			throw new HecubaException(e);
 		}
 
 	}
@@ -390,7 +392,7 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 				columnByName.getTimestamp(), columnByName.getTtl());
 	}
 
-	public CassandraResultSet<K, String> readAllColumns(K key) throws ConnectionException {
+	public CassandraResultSet<K, String> readAllColumns(K key) throws HecubaException {
 		try {
 
 			OperationResult<ColumnList<String>> result = keyspace.prepareQuery(columnFamily).getKey(key).execute();
@@ -405,7 +407,7 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 			if (log.isDebugEnabled()) {
 				log.debug("HecubaClientManager error while reading key " + key.toString());
 			}
-			throw e;
+			throw new HecubaException(e);
 		}
 	}
 
@@ -682,11 +684,15 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 	}
 
 	@Override
-	public CassandraResultSet<K, String> readColumns(K key, List<String> columnName) throws Exception {
-		final OperationResult<ColumnList<String>> operationResult = keyspace.prepareQuery(columnFamily).getKey(key)
-				.withColumnSlice(columnName).execute();
-		if (operationResult != null) {
-			return new AstyanaxResultSet<K, String>(operationResult.getResult());
+	public CassandraResultSet<K, String> readColumns(K key, List<String> columnName) throws HecubaException {
+		try {
+			final OperationResult<ColumnList<String>> operationResult = keyspace.prepareQuery(columnFamily).getKey(key)
+					.withColumnSlice(columnName).execute();
+			if (operationResult != null) {
+				return new AstyanaxResultSet<K, String>(operationResult.getResult());
+			}
+		}catch (ConnectionException e) {
+			throw new HecubaException(e);
 		}
 
 		return null;
@@ -694,23 +700,27 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 
 
 	@Override
-	public CassandraResultSet<K, String> readColumns(Set<K> keys, List<String> columnNames) throws Exception {
+	public CassandraResultSet<K, String> readColumns(Set<K> keys, List<String> columnNames) throws HecubaException {
 		if (CollectionUtils.isNotEmpty(columnNames)) {
-			final OperationResult<Rows<K, String>> result = keyspace.prepareQuery(columnFamily).getKeySlice(keys)
-					.withColumnSlice(columnNames).execute();
-			if (isClientAdapterDebugMessagesEnabled) {
-				log.info(columnNames.size() + " columns retrieved from Cassandra [Astyanax] for " + keys.size() +
-						" keys . Exec Time (micro-sec) = " + (result.getLatency() / 1000) + ", Host used = " +
-						result.getHost());
+			try {
+				final OperationResult<Rows<K, String>> result = keyspace.prepareQuery(columnFamily).getKeySlice(keys)
+						.withColumnSlice(columnNames).execute();
+				if (isClientAdapterDebugMessagesEnabled) {
+					log.info(columnNames.size() + " columns retrieved from Cassandra [Astyanax] for " + keys.size() +
+							" keys . Exec Time (micro-sec) = " + (result.getLatency() / 1000) + ", Host used = " +
+							result.getHost());
+				}
+				return new AstyanaxResultSet<K, String>(result);
+			}catch (ConnectionException e) {
+				throw new HecubaException(e);
 			}
-			return new AstyanaxResultSet<K, String>(result);
 		} else {
 			return readAllColumns(keys);
 		}
 	}
 
 	@Override
-	public CassandraResultSet<K, String> readAllColumns(Set<K> keys) throws Exception {
+	public CassandraResultSet<K, String> readAllColumns(Set<K> keys) throws HecubaException {
 		// This method was added as part of multi-get feature for cache calls.
 		try {
 
@@ -729,7 +739,7 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 				log.debug("Caught Exception while reading for multiple keys", e);
 				logDownedHosts();
 			}
-			throw e;
+			throw new HecubaException(e);
 		}
 	}
 

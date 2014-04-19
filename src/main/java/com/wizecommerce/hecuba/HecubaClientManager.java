@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.wizecommerce.hecuba.exceptions.HecubaException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -308,7 +309,7 @@ public abstract class HecubaClientManager<K> {
 	 * @param key - key of the column to be updated.
 	 * @param row - a map of columnNames and their respected values to be updated.
 	 */
-	public void updateRow(K key, Map<String, Object> row) throws Exception {
+	public void updateRow(K key, Map<String, Object> row) throws HecubaException {
 		updateRow(key, row, null, null);
 	}
 
@@ -326,7 +327,7 @@ public abstract class HecubaClientManager<K> {
 	 * @param ttls       - a map of column names to their ttls. Defaults to not expire.
 	 */
 	public abstract void updateRow(K key, Map<String, Object> row, Map<String, Long> timestamps,
-			Map<String, Integer> ttls) throws Exception;
+			Map<String, Integer> ttls) throws HecubaException;
 
 	/**
 	 * Reads the value of a column related to a given key.
@@ -427,7 +428,7 @@ public abstract class HecubaClientManager<K> {
 	 *
 	 * @return CassandraResultSet (interface to get column values)
 	 */
-	public abstract CassandraResultSet<K, String> readAllColumns(K key) throws Exception;
+	public abstract CassandraResultSet<K, String> readAllColumns(K key) throws HecubaException;
 
 
 	/**
@@ -514,9 +515,9 @@ public abstract class HecubaClientManager<K> {
 	 *
 	 * @return -- CassandraResultSet<K, String>. CassandraResultSet wraps the object returned by Hector/Astyanax API.
 	 *
-	 * @throws Exception
+	 * @throws com.wizecommerce.hecuba.exceptions.HecubaException
 	 */
-	public abstract CassandraResultSet<K, String> readAllColumns(Set<K> keys) throws Exception;
+	public abstract CassandraResultSet<K, String> readAllColumns(Set<K> keys) throws HecubaException;
 
 
 	/**
@@ -562,9 +563,9 @@ public abstract class HecubaClientManager<K> {
 	 *
 	 * @return
 	 *
-	 * @throws Exception
+	 * @throws com.wizecommerce.hecuba.exceptions.HecubaException
 	 */
-	public abstract CassandraResultSet<K, String> readColumns(K key, List<String> columnNames) throws Exception;
+	public abstract CassandraResultSet<K, String> readColumns(K key, List<String> columnNames) throws HecubaException;
 
 
 	/**
@@ -576,9 +577,9 @@ public abstract class HecubaClientManager<K> {
 	 *
 	 * @return
 	 *
-	 * @throws Exception
+	 * @throws com.wizecommerce.hecuba.exceptions.HecubaException
 	 */
-	public abstract CassandraResultSet<K, String> readColumns(Set<K> keys, List<String> columnNames) throws Exception;
+	public abstract CassandraResultSet<K, String> readColumns(Set<K> keys, List<String> columnNames) throws HecubaException;
 
 	/**
 	 * Deletes a given column value of a row identified by the key.

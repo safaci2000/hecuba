@@ -1012,7 +1012,7 @@ public class HectorBasedHecubaClientManager<K> extends HecubaClientManager<K> {
 	}
 
 	@Override
-	public CassandraResultSet<K, String> readColumns(Set<K> keys, List<String> columnNames) throws Exception {
+	public CassandraResultSet<K, String> readColumns(Set<K> keys, List<String> columnNames) throws HectorException {
 		if (CollectionUtils.isNotEmpty(columnNames)) {
 			ColumnFamilyResult<K, String> queriedColumns;
 			try {
