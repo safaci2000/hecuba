@@ -33,11 +33,11 @@ public class HecubaObjectFactory {
 	public HecubaClientManager<Long> getHecubaClientManagerWithLongKeys(CassandraParamsBean parameters,
 																		HecubaConstants.CassandraClientImplementation cassandraManagerType) {
 		if (cassandraManagerType == HecubaConstants.CassandraClientImplementation.ASTYANAX) {
-			return new AstyanaxBasedHecubaClientManager<>(parameters,
+			return new AstyanaxBasedHecubaClientManager<Long>(parameters,
 															  com.netflix.astyanax.serializers.LongSerializer.get());
 		} else {
 			// Default.
-			return new HectorBasedHecubaClientManager<>(parameters, me.prettyprint.cassandra.serializers.LongSerializer.get());
+			return new HectorBasedHecubaClientManager<Long>(parameters, me.prettyprint.cassandra.serializers.LongSerializer.get());
 		}
 	}
 

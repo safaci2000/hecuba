@@ -805,7 +805,7 @@ public abstract class HecubaClientManager<K> {
 	protected List<String> getSecondaryIndexKeys(String columnName, List<String> columnValues) {
 		List<String> secondaryIndexKeys = null;
 		if (columnValues != null && columnValues.size() > 0) {
-			secondaryIndexKeys = new ArrayList<>();
+			secondaryIndexKeys = new ArrayList<String>();
 			for (String columnValue : columnValues) {
 				secondaryIndexKeys.add(getSecondaryIndexKey(columnName, columnValue));
 			}

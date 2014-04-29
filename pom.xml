@@ -2,7 +2,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.wizecommerce</groupId>
-	<artifactId>hecuba-client</artifactId>
+	<artifactId>hecuba-client-legacy</artifactId>
 	<packaging>jar</packaging>
 	<version>0.0.53-SNAPSHOT</version>
 	<name>Hecuba</name>
@@ -152,8 +152,8 @@
 				<version>2.3.2</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 		</plugins>

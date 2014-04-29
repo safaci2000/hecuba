@@ -406,7 +406,7 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 				log.info("Row retrieved from Cassandra. Exec Time (micro-sec) = " + result.getLatency() / 1000 +
 						", Host used = " + result.getHost() + ", Key = " + key);
 			}
-			return new AstyanaxResultSet<>(columns);
+			return new AstyanaxResultSet<K, String>(columns);
 
 		} catch (ConnectionException e) {
 			if (log.isDebugEnabled()) {
@@ -627,7 +627,7 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 			Map<String, List<K>> keysMap = retrieveKeysFromSecondaryIndex(columnName, columnValues);
 
 			if (MapUtils.isNotEmpty(keysMap)) {
-				Set<K> keys = new HashSet<>();
+				Set<K> keys = new HashSet<K>();
 				for (List<K> keysForColValue : keysMap.values()) {
 					keys.addAll(keysForColValue);
 				}
@@ -834,12 +834,12 @@ public class AstyanaxBasedHecubaClientManager<K> extends HecubaClientManager<K> 
 			}
 
 			if (result != null && result.getResult().size() > 0) {
-				Map<String, List<K>> rowKeysMap = new HashMap<>();
+				Map<String, List<K>> rowKeysMap = new HashMap<String, List<K>>();
 				Iterator<Row<String, K>> rowIterator = result.getResult().iterator();
 				while (rowIterator.hasNext()) {
 					Row<String, K> row = rowIterator.next();
 					Iterator<Column<K>> columnIterator = row.getColumns().iterator();
-					List<K> keys = new ArrayList<>();
+					List<K> keys = new ArrayList<K>();
 					while (columnIterator.hasNext()) {
 						keys.add(columnIterator.next().getName());
 					}

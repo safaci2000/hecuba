@@ -1777,19 +1777,19 @@ public abstract class HecubaCassandraManagerTestBase extends CassandraTestBase {
 		HecubaClientManager<Long> cassandraManager = getHecubaClientManager(bean);
 
 		// insert the record 1234L with columns having secondary indices.
-		HashMap<String, Object> row = new HashMap<>();
+		HashMap<String, Object> row = new HashMap<String, Object>();
 		row.put("column_1", "value_11");
 		row.put("column_2", "value_12");
 		row.put("MySecondaryKey", "MySecondaryValue");
 		cassandraManager.updateRow(1234L, row);
 
-		row = new HashMap<>();
+		row = new HashMap<String, Object>();
 		row.put("column_1", "value_21");
 		row.put("column_2", "value_22");
 		row.put("MySecondaryKey", "MySecondaryValue");
 		cassandraManager.updateRow(2345L, row);
 
-		row = new HashMap<>();
+		row = new HashMap<String, Object>();
 		row.put("column_1", "value_31");
 		row.put("column_2", "value_32");
 		row.put("MySecondaryKey", "MySecondaryValue3");
@@ -1803,7 +1803,7 @@ public abstract class HecubaCassandraManagerTestBase extends CassandraTestBase {
 		assertEquals(new Long(2345L), keys.get(1));
 
 		// now retrieve keys for 2 columnValues (multi-get)
-		List<String> siColumnValues = new ArrayList<>();
+		List<String> siColumnValues = new ArrayList<String>();
 		siColumnValues.add("MySecondaryValue");
 		siColumnValues.add("MySecondaryValue3");
 		final Map<String, List<Long>> keysMap = cassandraManager.retrieveKeysBySecondaryIndex("MySecondaryKey", siColumnValues);
@@ -1944,14 +1944,14 @@ public abstract class HecubaCassandraManagerTestBase extends CassandraTestBase {
 		final int numberOfRecordsInserted = 25;
 		//Write 120 rows to cassandra, with the same secondary Index.
 		for (long i = 0; i < numberOfRecordsInserted; i++) {
-			HashMap<String, Object> row = new HashMap<>();
+			HashMap<String, Object> row = new HashMap<String, Object>();
 			row.put("column_1", "value_1");
 			row.put("column_2", "value_2");
 			row.put("MySecondaryKey_1", i % 5);
 			cassandraManager.updateRow(i, row);
 		}
 
-		List<String> expectedSecondaryIndexValues = new ArrayList<>();
+		List<String> expectedSecondaryIndexValues = new ArrayList<String>();
 		expectedSecondaryIndexValues.add("1");
 		expectedSecondaryIndexValues.add("2");
 

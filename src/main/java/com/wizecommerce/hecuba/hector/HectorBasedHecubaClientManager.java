@@ -604,7 +604,7 @@ public class HectorBasedHecubaClientManager<K> extends HecubaClientManager<K> {
 		Map<String, List<K>> keysMap = retrieveKeysFromSecondaryIndex(columnName, columnValues);
 
 		if (MapUtils.isNotEmpty(keysMap)) {
-			Set<K> keys = new HashSet<>();
+			Set<K> keys = new HashSet<K>();
 			for (List<K> keysForColValue : keysMap.values()) {
 				keys.addAll(keysForColValue);
 			}
@@ -869,7 +869,7 @@ public class HectorBasedHecubaClientManager<K> extends HecubaClientManager<K> {
 
 	private void reConfigureParameters() {
 
-		columnFamilyTemplates = new ArrayList<>();
+		columnFamilyTemplates = new ArrayList<ColumnFamilyTemplate<K, String>>();
 		configureHectorPools();
 	}
 
@@ -882,7 +882,7 @@ public class HectorBasedHecubaClientManager<K> extends HecubaClientManager<K> {
 		log.info("Hector pool created for " + listOfNodesAndPorts);
 
 		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
-			Map<String, String> accessMap = new HashMap<>();
+			Map<String, String> accessMap = new HashMap<String, String>();
 			accessMap.put("username", this.username);
 			accessMap.put("password", this.password);
 			cluster = HFactory.getOrCreateCluster(clusterName, cassandraHostConfigurator, accessMap);
@@ -922,7 +922,7 @@ public class HectorBasedHecubaClientManager<K> extends HecubaClientManager<K> {
 		cassandraHostConfigurator.setLoadBalancingPolicy(hectorClientConfiguration.getLoadBalancingPolicy());
 		log.info("Hector Host Configurator Parameters \n" + cassandraHostConfigurator.toString());
 		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
-			Map<String, String> accessMap = new HashMap<>();
+			Map<String, String> accessMap = new HashMap<String, String>();
 			accessMap.put("username", this.username);
 			accessMap.put("password", this.password);
 		}
@@ -1097,7 +1097,7 @@ public class HectorBasedHecubaClientManager<K> extends HecubaClientManager<K> {
 			}
 
 			if (columns != null && CollectionUtils.isNotEmpty(columns.getColumnNames())) {
-				return new ArrayList<>(columns.getColumnNames());
+				return new ArrayList<K>(columns.getColumnNames());
 			}
 		} catch (HectorException e) {
 			log.debug("HecubaClientManager error while retrieving secondary index " + getSecondaryIndexKey(columnName,
@@ -1121,7 +1121,7 @@ public class HectorBasedHecubaClientManager<K> extends HecubaClientManager<K> {
 			if (maxSiColumnCount > 0) {
 				resultSet = readSiColumnSlice(secondaryIndexKeys, false, maxSiColumnCount);
 			} else {
-				resultSet = new HectorResultSet<>(secondaryIndexedColumnFamilyTemplate.queryColumns(secondaryIndexKeys));
+				resultSet = new HectorResultSet<String, K>(secondaryIndexedColumnFamilyTemplate.queryColumns(secondaryIndexKeys));
 			}
 
 			if (isClientAdapterDebugMessagesEnabled) {
@@ -1131,16 +1131,16 @@ public class HectorBasedHecubaClientManager<K> extends HecubaClientManager<K> {
 			}
 
 			if (resultSet != null) {
-				Map<String, List<K>> keysMap = new HashMap<>();
+				Map<String, List<K>> keysMap = new HashMap<String, List<K>>();
 				//Deals with the case where the first element is a miss.
 				if (CollectionUtils.isNotEmpty(resultSet.getColumnNames())) {
-					keysMap.put(getSecondaryIndexedColumnValue(resultSet.getKey()), new ArrayList<>(resultSet.getColumnNames()));
+					keysMap.put(getSecondaryIndexedColumnValue(resultSet.getKey()), new ArrayList(resultSet.getColumnNames()));
 				}
 
 				while (resultSet.hasNextResult()) {
 					resultSet.nextResult();
 					if (CollectionUtils.isNotEmpty(resultSet.getColumnNames())) {
-						keysMap.put(getSecondaryIndexedColumnValue(resultSet.getKey()), new ArrayList<>(resultSet.getColumnNames()));
+						keysMap.put(getSecondaryIndexedColumnValue(resultSet.getKey()), new ArrayList(resultSet.getColumnNames()));
 					}
 				}
 				return keysMap;
